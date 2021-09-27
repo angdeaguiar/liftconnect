@@ -1,2 +1,2 @@
-# liftconnect
+# lift&connect
 Capstone Project
