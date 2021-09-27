@@ -1,64 +1,66 @@
-drop database liftconnect;
-
-create database liftconnect;
+create database if not exists liftconnect;
+create extension pgcrypto;
 
 \c liftconnect;
 
 create type pronoun as enum ('she/her', 'he/him', 'they/them');
 
 create table users (
-    id uuid not null,
+    id uuid default public.gen_random_uuid() primary key,
     first_name varchar(50) not null,
     last_name varchar(50) not null,
     email varchar(50) not null,
+    password string varchar(50) not null,
     city varchar(50) not null,
     pronouns pronoun,
-    created_at timestamptz default now
+    created_at timestamptz default now()
 );
 
 create table personal_records (
-    id uuid not null,
-    user_id uuid references users (id) not null,
+    id uuid default public.gen_random_uuid() primary key,
+    user_id uuid not null references users (id),
     squat int,
     deadlift int,
     bench int
 );
 
 create table user_followings (
-    following_id uuid references users (id) not null,
-    user_id uuid references users (id) not null
+    following_id uuid not null references users (id),
+    user_id uuid not null references users (id),
+
+    primary key (following_id, user_id)
 );
 
 create table user_workouts (
-    id uuid not null,
-    user_id uuid references users (id) not null,
+    id uuid default public.gen_random_uuid() primary key,
+    user_id uuid not null references users (id),
     title varchar(100),
     notes text,
-    created_at timestamptz default now
+    created_at timestamptz default now()
 );
 
 create table workout_exercises (
-    id uuid not null,
-    workout_id uuid references user_workouts (id) not null,
+    id uuid default public.gen_random_uuid() primary key,
+    workout_id uuid not null references user_workouts (id),
     api_id varchar(36),
     name varchar(50),
     sets int,
     reps int,
-    weight int,
+    weight int
 );
 
 create table posts (
-    id uuid not null,
-    user_id uuid references users (id) not null,
+    id uuid default public.gen_random_uuid() primary key,
+    user_id uuid not null references users (id),
     title varchar(50),
     content text,
-    created_at timestamptz default now,
+    created_at timestamptz default now()
 );
 
 create table comments (
-    id uuid not null,
-    user_id uuid references users (id) not null,
-    post_id uuid references posts (id) not null,
+    id uuid default public.gen_random_uuid() primary key,
+    user_id uuid not null references users (id),
+    post_id uuid not null references posts (id),
     content text,
-    created_at timestamptz default now
+    created_at timestamptz default now()
 );
