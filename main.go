@@ -26,7 +26,8 @@ func main() {
 	api.GET("/users/:id", handlers.GetUserByIDHandler)
 	api.POST("/users/register", handlers.RegisterUserHandler)
 	api.POST("/users/login", handlers.LoginHandler)
-	api.POST("users/personalrecords", handlers.CreatePersonalRecordsHandler)
+	api.POST("/users/personalrecords", handlers.CreatePersonalRecordsHandler)
+	api.POST("/users/:id/follow/:fid", handlers.FollowUserHandler)
 
 	// Posts
 	api.GET("/posts", handlers.GetPostsByUserHandler)

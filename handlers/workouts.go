@@ -16,9 +16,29 @@ const RapidAPIHost = "exercisedb.p.rapidapi.com"
 // GetWorkoutsByUserHandler handles a GET request for retrieving a given
 // users workouts.
 func GetWorkoutsByUserHandler(c *gin.Context) {
-	workouts := []models.UserWorkout{}
+	workouts := models.UserWorkouts{}
+	exercises := []*models.WorkoutExercise{}
 
-	models.DB.Where("user_id = ?", c.Param("id")).Find(&workouts)
+	if err := models.DB.Where("user_id = ?", c.Param("id")).Find(workouts).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	if err := models.DB.
+		Where("workout_id in (?)", workouts.IDs()).
+		Group("workout_id").
+		Order("order").
+		Find(exercises).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	m := workouts.Map()
+	for _, exercise := range exercises {
+		if w, ok := m[exercise.WorkoutID]; ok {
+			w.WorkoutExercises = append(w.WorkoutExercises, exercise)
+		}
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": workouts})
 }
@@ -99,5 +119,32 @@ func GetExercisesByNameHandler(c *gin.Context) {
 // CreateWorkoutHandler handles a POST request for saving a users
 // workout and all the exercises to the database.
 func CreateWorkoutHandler(c *gin.Context) {
+	workout := models.UserWorkout{}
 
+	if err := c.ShouldBindJSON(&workout); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	if err := models.DB.Save(&workout); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	if len(workout.WorkoutExercises) > 0 {
+		for _, exercise := range workout.WorkoutExercises {
+			if err := models.DB.Create(&models.WorkoutExercise{
+				WorkoutID: workout.ID,
+				ApiID:     exercise.ApiID,
+				Name:      exercise.Name,
+				Sets:      exercise.Sets,
+				Reps:      exercise.Reps,
+			}).Error; err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err})
+				return
+			}
+		}
+	}
+
+	c.Status(http.StatusOK)
 }

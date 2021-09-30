@@ -17,7 +17,12 @@ const WeightVariation = 20
 func GetUserHandler(c *gin.Context) {
 	var users []models.User
 
-	models.DB.Where("first_name like %" + c.Query("firstname") + "%").Find(&users)
+	if err := models.DB.
+		Where("first_name like %" + c.Query("firstname") + "%").
+		Find(&users).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": users})
 }
@@ -27,7 +32,7 @@ func RegisterUserHandler(c *gin.Context) {
 	user, userEmail := models.User{}, models.User{}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -69,12 +74,11 @@ func LoginHandler(c *gin.Context) {
 	user := models.User{}
 
 	if err := c.ShouldBindJSON(&credentials); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	q := models.DB.Where("email = ?", credentials.Email).Find(&user)
-	if q.Error != nil {
+	if err := models.DB.Where("email = ?", credentials.Email).Find(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": q.Error})
 		return
 	}
@@ -101,12 +105,12 @@ func RecommendedUserHandler(c *gin.Context) {
 	recommendedUsers := []models.User{}
 	prs := models.PersonalRecords{}
 
-	if err := models.DB.Where("id = ?", id).Find(&user); err != nil {
+	if err := models.DB.Where("id = ?", id).Find(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	if err := models.DB.Where("user_id = ?", user.ID).Find(&prs); err != nil {
+	if err := models.DB.Where("user_id = ?", user.ID).Find(&prs).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -116,7 +120,7 @@ func RecommendedUserHandler(c *gin.Context) {
 		Where("bench between ? and ?", prs.Bench-WeightVariation, prs.Bench+WeightVariation).
 		Or("squat between ? and ?", prs.Squat-WeightVariation, prs.Squat+WeightVariation).
 		Or("deadlift between ? and ?", prs.Deadlift-WeightVariation, prs.Deadlift+WeightVariation).
-		Find(&recommendedUsers); err != nil {
+		Find(&recommendedUsers).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -130,12 +134,12 @@ func GetUserByIDHandler(c *gin.Context) {
 	user := models.User{}
 	ups := models.PersonalRecords{}
 
-	if err := models.DB.Where("id = ?", id).Find(&user); err != nil {
+	if err := models.DB.Where("id = ?", id).Find(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	if err := models.DB.Where("user_id = ?", id).Find(&ups); err != nil {
+	if err := models.DB.Where("user_id = ?", id).Find(&ups).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -150,14 +154,28 @@ func CreatePersonalRecordsHandler(c *gin.Context) {
 	prs := models.PersonalRecords{}
 
 	if err := c.ShouldBindJSON(&prs); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	if err := models.DB.Save(&prs); err != nil {
+	if err := models.DB.Save(&prs).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": prs})
+}
+
+func FollowUserHandler(c *gin.Context) {
+	userFollowing := &models.UserFollowing{
+		UserID:      c.Param("id"),
+		FollowingID: c.Param("fid"),
+	}
+
+	if err := models.DB.Save(userFollowing).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	c.Status(http.StatusOK)
 }

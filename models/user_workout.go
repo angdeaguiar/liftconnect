@@ -12,3 +12,22 @@ type UserWorkout struct {
 
 	WorkoutExercises []*WorkoutExercise `json:"workout_exercises" sql:"-"`
 }
+
+// User workout is a slice of a a user's workout.
+type UserWorkouts []*UserWorkout
+
+func (uws UserWorkouts) IDs() []string {
+	ids := make([]string, len(uws))
+	for i, uw := range uws {
+		ids[i] = uw.ID
+	}
+	return ids
+}
+
+func (uws UserWorkouts) Map() map[string]*UserWorkout {
+	m := make(map[string]*UserWorkout, len(uws))
+	for i, uw := range uws {
+		m[uw.ID] = uws[i]
+	}
+	return m
+}

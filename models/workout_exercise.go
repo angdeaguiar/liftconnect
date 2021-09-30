@@ -8,4 +8,5 @@ type WorkoutExercise struct {
 	Name      string `json:"name"`
 	Sets      int    `json:"sets"`
 	Reps      int    `json:"reps"`
+	Order     int    `json:"order"`
 }

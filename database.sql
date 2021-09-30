@@ -46,7 +46,8 @@ create table workout_exercises (
     name varchar(50),
     sets int,
     reps int,
-    weight int
+    weight int,
+    order int
 );
 
 create table posts (

@@ -11,9 +11,12 @@ import (
 // GetPostsByUserHandler handles a GET request for retrieving posts
 // by a given user.
 func GetPostsByUserHandler(c *gin.Context) {
-	var posts []models.Post
+	posts := []models.Post{}
 
-	models.DB.Find(&posts)
+	if err := models.DB.Find(&posts).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": posts})
 }
