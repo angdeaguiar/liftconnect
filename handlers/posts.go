@@ -17,3 +17,19 @@ func GetPostsByUserHandler(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": posts})
 }
+
+func CreatePostHandler(c *gin.Context) {
+
+}
+
+func CreateCommentHandler(c *gin.Context) {
+
+}
+
+func DeletePostHandler(c *gin.Context) {
+
+}
+
+func DeleteCommentHandler(c *gin.Context) {
+
+}

@@ -7,4 +7,6 @@ type Post struct {
 	Title     string `json:"title"`
 	Content   string `json:"content"`
 	CreatedAt string `json:"created_at"`
+
+	Comments []*Comment `json:"comments" sql:"-"`
 }

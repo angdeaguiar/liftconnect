@@ -21,6 +21,7 @@ func main() {
 	// Users
 	router.GET("api/users", handlers.GetUserHandler)
 	router.POST("api/users/register", handlers.RegisterUserHandler)
+	router.POST("api/users/login", handlers.LoginHandler)
 
 	// Posts
 	router.GET("api/posts", handlers.GetPostsByUserHandler)

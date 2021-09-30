@@ -9,4 +9,6 @@ type UserWorkout struct {
 	Title     string    `json:"title"`
 	Notes     string    `json:"notes"`
 	CreatedAt time.Time `json:"created_at"`
+
+	WorkoutExercises []*WorkoutExercise `json:"workout_exercises" sql:"-"`
 }
