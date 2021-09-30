@@ -18,16 +18,25 @@ func main() {
 	// Setup route group for the API
 	models.ConnectDataBase()
 
+	api := router.Group("/api")
+
 	// Users
-	router.GET("api/users", handlers.GetUserHandler)
-	router.POST("api/users/register", handlers.RegisterUserHandler)
-	router.POST("api/users/login", handlers.LoginHandler)
+	api.GET("/users", handlers.GetUserHandler)
+	api.GET("/users/recommend/:id", handlers.RecommendedUserHandler)
+	api.GET("/users/:id", handlers.GetUserByIDHandler)
+	api.POST("/users/register", handlers.RegisterUserHandler)
+	api.POST("/users/login", handlers.LoginHandler)
+	api.POST("users/personalrecords", handlers.CreatePersonalRecordsHandler)
 
 	// Posts
-	router.GET("api/posts", handlers.GetPostsByUserHandler)
+	api.GET("/posts", handlers.GetPostsByUserHandler)
 
 	// Workouts
-	router.GET("api/workouts", handlers.GetWorkoutsByUserHandler)
+	api.GET("/workouts/:uid", handlers.GetWorkoutsByUserHandler)
+	api.GET("/workouts/exercises", handlers.GetExercisesHandler)
+	api.GET("/workouts/exercises/:target", handlers.GetExercisesByTargetHandler)
+	api.GET("/workouts/exercises/:name", handlers.GetExercisesByNameHandler)
+	api.POST("/workouts", handlers.CreateWorkoutHandler)
 
 	// Start and run the server
 	router.Run(":3000")
