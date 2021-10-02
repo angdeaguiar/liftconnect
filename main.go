@@ -30,7 +30,11 @@ func main() {
 	api.POST("/users/:id/follow/:fid", handlers.FollowUserHandler)
 
 	// Posts
-	api.GET("/posts", handlers.GetPostsByUserHandler)
+	api.GET("/posts/:id", handlers.GetPostsByUserHandler)
+	api.POST("/posts", handlers.CreatePostHandler)
+	api.POST("/posts/comment", handlers.CreateCommentHandler)
+	api.DELETE("/posts/:id", handlers.DeletePostHandler)
+	api.DELETE("posts/comment/:id", handlers.DeleteCommentHandler)
 
 	// Workouts
 	api.GET("/workouts/:uid", handlers.GetWorkoutsByUserHandler)

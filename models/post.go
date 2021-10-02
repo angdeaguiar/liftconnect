@@ -10,3 +10,22 @@ type Post struct {
 
 	Comments []*Comment `json:"comments" sql:"-"`
 }
+
+// Posts is a slice of a post.
+type Posts []*Post
+
+func (ps Posts) IDs() []string {
+	ids := make([]string, len(ps))
+	for i, p := range ps {
+		ids[i] = p.ID
+	}
+	return ids
+}
+
+func (ps Posts) Map() map[string]*Post {
+	m := make(map[string]*Post, len(ps))
+	for i, p := range ps {
+		m[p.ID] = ps[i]
+	}
+	return m
+}
