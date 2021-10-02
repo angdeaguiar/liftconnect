@@ -13,7 +13,7 @@ type UserWorkout struct {
 	WorkoutExercises []*WorkoutExercise `json:"workout_exercises" sql:"-"`
 }
 
-// User workout is a slice of a a user's workout.
+// UserWorkouts is a slice of a a user's workout.
 type UserWorkouts []*UserWorkout
 
 func (uws UserWorkouts) IDs() []string {
