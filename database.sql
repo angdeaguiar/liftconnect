@@ -9,8 +9,8 @@ create table users (
     id uuid default public.gen_random_uuid() primary key,
     first_name varchar(50) not null,
     last_name varchar(50) not null,
-    email varchar(50) not null,
-    password string varchar(50) not null,
+    email varchar(50) not null unique,
+    password varchar(50) not null,
     city varchar(50) not null,
     pronouns pronoun,
     created_at timestamptz default now()
@@ -47,7 +47,8 @@ create table workout_exercises (
     sets int,
     reps int,
     weight int,
-    order int
+    exercise_order int,
+    gif_url varchar(100)
 );
 
 create table posts (

@@ -21,25 +21,27 @@ func GetPostsByUserHandler(c *gin.Context) {
 		Joins("left join user_followings on posts.user_id = user_followings.following_id").
 		Where("user_followings.user_id = ?", id).
 		Where("posts.user_id = ? or user_followings.following_id is not null", id).
-		Order("created_at desc").
+		Order("posts.created_at desc").
 		Find(&posts).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	if err := models.DB.
-		Where("post_id is in (?)", posts.IDs()).
-		Group("post_id").
-		Order("created_at desc").
-		Find(comments).Error; err != nil {
+		Where("post_id in (?)", posts.IDs()).
+		Group("post_id, id").
+		Order("created_at").
+		Find(&comments).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	m := posts.Map()
-	for _, comment := range comments {
-		if p, ok := m[comment.PostID]; ok {
-			p.Comments = append(p.Comments, comment)
+	if len(comments) > 0 {
+		m := posts.Map()
+		for _, comment := range comments {
+			if p, ok := m[comment.PostID]; ok {
+				p.Comments = append(p.Comments, comment)
+			}
 		}
 	}
 
@@ -82,7 +84,7 @@ func CreateCommentHandler(c *gin.Context) {
 
 // DeletePostHandler handles a DELETE request for deleting a post record.
 func DeletePostHandler(c *gin.Context) {
-	if err := models.DB.Where("id = ?", c.Param("id")).Find(&models.Post{}).Error; err != nil {
+	if err := models.DB.Where("id = ?", c.Param("id")).Delete(&models.Post{}).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -92,7 +94,7 @@ func DeletePostHandler(c *gin.Context) {
 
 // DeleteCommentHandler handles a DELETE request for deleting a comment record.
 func DeleteCommentHandler(c *gin.Context) {
-	if err := models.DB.Where("id = ?", c.Param("id")).Find(&models.Comment{}).Error; err != nil {
+	if err := models.DB.Where("id = ?", c.Param("id")).Delete(&models.Comment{}).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}

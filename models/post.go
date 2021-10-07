@@ -1,12 +1,15 @@
 package models
 
+import "time"
+
 // Post represents a single post within the application
 type Post struct {
-	ID        string `json:"id"`
-	UserID    string `json:"user_id"`
-	Title     string `json:"title"`
-	Content   string `json:"content"`
-	CreatedAt string `json:"created_at"`
+	ID        string    `json:"id"`
+	UserID    string    `json:"user_id"`
+	User      *User     `json:"user" sql:"-"`
+	Title     string    `json:"title"`
+	Content   string    `json:"content"`
+	CreatedAt time.Time `json:"created_at"`
 
 	Comments []*Comment `json:"comments" sql:"-"`
 }

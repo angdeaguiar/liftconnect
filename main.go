@@ -21,7 +21,7 @@ func main() {
 	api := router.Group("/api")
 
 	// Users
-	api.GET("/users", handlers.GetUserHandler)
+	api.GET("/users/all/:id", handlers.GetUserHandler)
 	api.GET("/users/recommend/:id", handlers.RecommendedUserHandler)
 	api.GET("/users/:id", handlers.GetUserByIDHandler)
 	api.POST("/users/register", handlers.RegisterUserHandler)
@@ -39,8 +39,8 @@ func main() {
 	// Workouts
 	api.GET("/workouts/:uid", handlers.GetWorkoutsByUserHandler)
 	api.GET("/workouts/exercises", handlers.GetExercisesHandler)
-	api.GET("/workouts/exercises/:target", handlers.GetExercisesByTargetHandler)
-	api.GET("/workouts/exercises/:name", handlers.GetExercisesByNameHandler)
+	api.GET("/workouts/exercises/target/:target", handlers.GetExercisesByTargetHandler)
+	api.GET("/workouts/exercises/name/:name", handlers.GetExercisesByNameHandler)
 	api.POST("/workouts", handlers.CreateWorkoutHandler)
 
 	// Start and run the server

@@ -27,8 +27,8 @@ func GetWorkoutsByUserHandler(c *gin.Context) {
 	if err := models.DB.
 		Where("workout_id in (?)", workouts.IDs()).
 		Group("workout_id").
-		Order("order").
-		Find(exercises).Error; err != nil {
+		Order("exercise_order asc").
+		Find(&exercises).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -132,13 +132,15 @@ func CreateWorkoutHandler(c *gin.Context) {
 	}
 
 	if len(workout.WorkoutExercises) > 0 {
-		for _, exercise := range workout.WorkoutExercises {
+		for i, exercise := range workout.WorkoutExercises {
 			if err := models.DB.Create(&models.WorkoutExercise{
-				WorkoutID: workout.ID,
-				ApiID:     exercise.ApiID,
-				Name:      exercise.Name,
-				Sets:      exercise.Sets,
-				Reps:      exercise.Reps,
+				WorkoutID:     workout.ID,
+				ApiID:         exercise.ApiID,
+				Name:          exercise.Name,
+				Sets:          exercise.Sets,
+				Reps:          exercise.Reps,
+				ExerciseOrder: i,
+				GifURL:        exercise.GifURL,
 			}).Error; err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err})
 				return

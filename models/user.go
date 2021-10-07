@@ -21,5 +21,5 @@ type User struct {
 	Pronouns  *Pronouns `json:"pronouns"`
 	CreatedAt time.Time `json:"created_at"`
 
-	PersonalRecords *PersonalRecords `json:"personal_records" sql:"-"`
+	PersonalRecords *PersonalRecords `json:"personal_records,omitempty" sql:"-"`
 }

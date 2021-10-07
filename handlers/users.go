@@ -1,25 +1,39 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"regexp"
+	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 
 	"github.com/liftconnect/models"
 )
 
 const WeightVariation = 20
 
+type UserFollow struct {
+	models.User
+	Following bool `json:"following"`
+}
+
 // GetUserHandler handles a GET request for retriving users, with optional
 // filter querying.
 func GetUserHandler(c *gin.Context) {
-	var users []models.User
+	users := []UserFollow{}
+	filter := "%" + trim(c.Query("firstname")) + "%"
 
 	if err := models.DB.
-		Where("first_name like %" + c.Query("firstname") + "%").
-		Find(&users).Error; err != nil {
+		Table("users").
+		Select("users.*, exists"+
+			"(select 1 from user_followings where user_id = ? and following_id = users.id)"+
+			"as following", c.Param("id")).
+		Where("users.first_name like ?", filter).
+		Scan(&users).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -29,22 +43,10 @@ func GetUserHandler(c *gin.Context) {
 
 // RegisterUserHandler handles a POST request for registering users.
 func RegisterUserHandler(c *gin.Context) {
-	user, userEmail := models.User{}, models.User{}
+	user := models.User{}
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
-		return
-	}
-
-	// Check if Email has already been used
-	q := models.DB.Where("email = ?", user.Email).Find(&userEmail)
-	if q.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": q.Error})
-		return
-	}
-
-	if q.RowsAffected != 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "email is already registered"})
 		return
 	}
 
@@ -53,10 +55,18 @@ func RegisterUserHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-
 	user.Password = string(hashedPassword)
 
-	models.DB.Create(&user)
+	q := models.DB.Create(&user)
+	if q.Error != nil {
+		if models.DB.Where(models.User{Email: user.Email}).Take(&models.User{}).Error == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists with this given email."})
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": q.Error})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
@@ -78,8 +88,8 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	if err := models.DB.Where("email = ?", credentials.Email).Find(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": q.Error})
+	if err := models.DB.Where("email = ?", credentials.Email).Find(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
@@ -89,7 +99,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "password is incorrect"})
 		return
 	}
 
@@ -110,16 +120,24 @@ func RecommendedUserHandler(c *gin.Context) {
 		return
 	}
 
-	if err := models.DB.Where("user_id = ?", user.ID).Find(&prs).Error; err != nil {
+	if err := models.DB.Where("user_id = ?", id).Find(&prs).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	if err := models.DB.
-		Where("city like %"+user.City+"%").
-		Where("bench between ? and ?", prs.Bench-WeightVariation, prs.Bench+WeightVariation).
-		Or("squat between ? and ?", prs.Squat-WeightVariation, prs.Squat+WeightVariation).
-		Or("deadlift between ? and ?", prs.Deadlift-WeightVariation, prs.Deadlift+WeightVariation).
+		Select("users.*").
+		Joins("left join personal_records on users.id = personal_records.user_id").
+		Joins("left join user_followings on user_followings.following_id = users.id").
+		Where("users.id != ?", id).
+		Where("users.city = ?", user.City).
+		Where("user_followings.user_id != ? or user_followings.user_id is null", id).
+		Where("(personal_records.bench between ? and ?)"+
+			"or (personal_records.squat between ? and ?)"+
+			"or (personal_records.deadlift between ? and ?)",
+			prs.Bench-WeightVariation, prs.Bench+WeightVariation,
+			prs.Squat-WeightVariation, prs.Squat+WeightVariation,
+			prs.Deadlift-WeightVariation, prs.Deadlift+WeightVariation).
 		Find(&recommendedUsers).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -128,6 +146,7 @@ func RecommendedUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": recommendedUsers})
 }
 
+// GetUserByID handler handles a GET request for retrieving a user by their id.
 func GetUserByIDHandler(c *gin.Context) {
 	id := c.Param("id")
 
@@ -139,7 +158,8 @@ func GetUserByIDHandler(c *gin.Context) {
 		return
 	}
 
-	if err := models.DB.Where("user_id = ?", id).Find(&ups).Error; err != nil {
+	err := models.DB.Where("user_id = ?", id).Find(&ups).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -166,6 +186,8 @@ func CreatePersonalRecordsHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": prs})
 }
 
+// FollowUserHandler handles a GET request for a user following another
+// user.
 func FollowUserHandler(c *gin.Context) {
 	userFollowing := &models.UserFollowing{
 		UserID:      c.Param("id"),
@@ -178,4 +200,9 @@ func FollowUserHandler(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+// trim replaces all duplicate whitespace characters in s with a single space.
+func trim(s string) string {
+	return strings.TrimSpace(regexp.MustCompile(`(\w+):([0-9]\d{1,3})`).ReplaceAllString(s, " "))
 }
