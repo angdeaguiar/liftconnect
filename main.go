@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/liftconnect/handlers"
@@ -12,11 +12,19 @@ func main() {
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
 
-	// Serve frontend static files
-	router.Use(static.Serve("/", static.LocalFile("./web/js", true)))
+	// Configure Cors
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowCredentials: true,
+	}))
 
 	// Setup route group for the API
 	models.ConnectDataBase()
+
+	// Session
+	router.GET("/self", handlers.UserHandler)
+	router.POST("/self/login", handlers.LoginHandler)
+	router.POST("/self/logout", handlers.LogoutHandler)
 
 	api := router.Group("/api")
 
@@ -25,7 +33,6 @@ func main() {
 	api.GET("/users/recommend/:id", handlers.RecommendedUserHandler)
 	api.GET("/users/:id", handlers.GetUserByIDHandler)
 	api.POST("/users/register", handlers.RegisterUserHandler)
-	api.POST("/users/login", handlers.LoginHandler)
 	api.POST("/users/personalrecords", handlers.CreatePersonalRecordsHandler)
 	api.POST("/users/:id/follow/:fid", handlers.FollowUserHandler)
 
@@ -44,5 +51,5 @@ func main() {
 	api.POST("/workouts", handlers.CreateWorkoutHandler)
 
 	// Start and run the server
-	router.Run(":3000")
+	router.Run(":8080")
 }

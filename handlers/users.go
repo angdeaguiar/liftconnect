@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 
@@ -15,6 +17,7 @@ import (
 )
 
 const WeightVariation = 20
+const SecretKey = "secret"
 
 type UserFollow struct {
 	models.User
@@ -60,7 +63,7 @@ func RegisterUserHandler(c *gin.Context) {
 	q := models.DB.Create(&user)
 	if q.Error != nil {
 		if models.DB.Where(models.User{Email: user.Email}).Take(&models.User{}).Error == nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists with this given email."})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "user already exists with this given email."})
 			return
 		}
 
@@ -94,16 +97,29 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	if len(user.ID) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user does not exist"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "user does not exist"})
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "password is incorrect"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "password is incorrect"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Issuer:    user.ID,
+		ExpiresAt: time.Now().Add(time.Hour * 4).Unix(), // Expires after 4 hours
+	})
+
+	token, err := claims.SignedString([]byte(SecretKey))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to login"})
+	}
+
+	expiredAt := 60 * 60 * 4
+	c.SetCookie("jwt", token, expiredAt, "/", "localhost", false, true)
+
+	c.Status(http.StatusOK)
 }
 
 // RecommenedUserHandler finds users to recommend for a given user
@@ -198,6 +214,42 @@ func FollowUserHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
+
+	c.Status(http.StatusOK)
+}
+
+// UserHandler handles a GET request for ensuring the user is authenicated
+func UserHandler(c *gin.Context) {
+	cookie, err := c.Cookie("jwt")
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(SecretKey), nil
+	})
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unathenticatd"})
+		return
+	}
+
+	claims := token.Claims.(jwt.StandardClaims)
+
+	user := models.User{}
+	if err := models.DB.Where("id = ?", claims.Issuer).Find(&user).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": user})
+}
+
+// LogoutHandler handlers a POST request for setting the users session cookie in the past.
+func LogoutHandler(c *gin.Context) {
+	c.SetCookie("jwt", "", -1, "/", "localhost", false, true)
 
 	c.Status(http.StatusOK)
 }
