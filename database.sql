@@ -1,7 +1,8 @@
-create database if not exists liftconnect;
-create extension pgcrypto;
+create database liftconnect;
 
 \c liftconnect;
+
+create extension pgcrypto;
 
 create type pronoun as enum ('she/her', 'he/him', 'they/them');
 
@@ -10,7 +11,7 @@ create table users (
     first_name varchar(50) not null,
     last_name varchar(50) not null,
     email varchar(50) not null unique,
-    password varchar(50) not null,
+    password varchar(200) not null,
     city varchar(50) not null,
     pronouns pronoun,
     created_at timestamptz default now()
