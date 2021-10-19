@@ -1,22 +1,35 @@
 package main
 
 import (
-	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	"github.com/liftconnect/handlers"
 	"github.com/liftconnect/models"
 )
 
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+
 func main() {
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
 
 	// Configure Cors
-	router.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
-		AllowCredentials: true,
-	}))
+	router.Use(CORSMiddleware())
 
 	// Setup route group for the API
 	models.ConnectDataBase()

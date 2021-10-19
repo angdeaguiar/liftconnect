@@ -74,6 +74,21 @@ func RegisterUserHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
+type CookieAccess struct {
+	Writer http.ResponseWriter
+}
+
+// method to write cookie
+func (ca *CookieAccess) SetToken(token string) {
+	http.SetCookie(ca.Writer, &http.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		HttpOnly: true,
+		Path:     "/",
+		Expires:  time.Now().Add(time.Hour * 4),
+	})
+}
+
 // UserLogin is a model representing the credentials a user needs to login
 type UserLogin struct {
 	Email    string `json:"email"`
@@ -85,6 +100,8 @@ type UserLogin struct {
 func LoginHandler(c *gin.Context) {
 	credentials := UserLogin{}
 	user := models.User{}
+
+	// ca := &CookieAccess{Writer: c.Writer}
 
 	if err := c.ShouldBindJSON(&credentials); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -107,8 +124,8 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * 4).Unix(),
 		Issuer:    user.ID,
-		ExpiresAt: time.Now().Add(time.Hour * 4).Unix(), // Expires after 4 hours
 	})
 
 	token, err := claims.SignedString([]byte(SecretKey))
@@ -221,25 +238,24 @@ func FollowUserHandler(c *gin.Context) {
 // UserHandler handles a GET request for ensuring the user is authenicated
 func UserHandler(c *gin.Context) {
 	cookie, err := c.Cookie("jwt")
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	token, err := jwt.ParseWithClaims(cookie, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unathenticatd"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err})
 		return
 	}
 
-	claims := token.Claims.(jwt.StandardClaims)
+	claims := token.Claims.(jwt.MapClaims)
 
 	user := models.User{}
-	if err := models.DB.Where("id = ?", claims.Issuer).Find(&user).Error; err != nil {
+	if err := models.DB.Where("id = ?", claims["iss"]).Find(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}

@@ -18,13 +18,19 @@ func GetPostsByUserHandler(c *gin.Context) {
 
 	if err := models.DB.
 		Select("posts.*").
-		Joins("left join user_followings on posts.user_id = user_followings.following_id").
-		Where("user_followings.user_id = ?", id).
-		Where("posts.user_id = ? or user_followings.following_id is not null", id).
+		Joins("join user_followings on posts.user_id = user_followings.following_id").
+		Where("user_followings.user_id = ? or posts.user_id = ?", id, id).
 		Order("posts.created_at desc").
 		Find(&posts).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
+	}
+
+	for _, post := range posts {
+		if err := mapUserToPost(post); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unable to fetch user for posts"})
+			return
+		}
 	}
 
 	if err := models.DB.
@@ -41,6 +47,11 @@ func GetPostsByUserHandler(c *gin.Context) {
 		for _, comment := range comments {
 			if p, ok := m[comment.PostID]; ok {
 				p.Comments = append(p.Comments, comment)
+			}
+
+			if err := mapUserToComment(comment); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "unable to fetch user for posts"})
+				return
 			}
 		}
 	}
@@ -100,4 +111,28 @@ func DeleteCommentHandler(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+// mapUserToPost
+func mapUserToPost(post *models.Post) error {
+	user := models.User{}
+	if err := models.DB.Where("id = ?", post.UserID).Find(&user).Error; err != nil {
+		return err
+	}
+
+	post.User = &user
+
+	return nil
+}
+
+// mapUserToComment
+func mapUserToComment(comment *models.Comment) error {
+	user := models.User{}
+	if err := models.DB.Where("id = ?", comment.UserID).Find(&user).Error; err != nil {
+		return err
+	}
+
+	comment.User = &user
+
+	return nil
 }
