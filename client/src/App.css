@@ -108,4 +108,69 @@
 
 .textarea {
   resize: none;
+  width: 100%;
+}
+
+.input-prs label, .input-prs input {
+  float: none; /* if you had floats before? otherwise inline-block will behave differently */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.middle-lane {
+  flex: 50%;
+}
+
+.right {
+ flex: 50%;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  margin: 40px;
+  width: 45%;
+  padding: 20px;
+  background-color: #E6E6E6;
+}
+
+.scrollable-list {
+  height: 90vh;
+  overflow:hidden;
+  overflow-y:scroll;
+}
+
+.search-exercises {
+  float: left;
+  height: 40px;
+  font-size: 18px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.exercises-container {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 50%;
+  padding: 40px 80px;
+}
+
+.create-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.exercise {
+  width: 100%;
+  margin: 10px 0px;
+  border: solid 1px lightgrey;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
 }

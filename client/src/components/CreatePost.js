@@ -33,7 +33,6 @@ const CreatePost = (props) => {
                     id="post-text-area"
                     placeholder="Start typing to create post..."
                     rows="6"
-                    cols="100"
                     onChange={e => setContent(e.target.value)}
                     value={content}
                 >
