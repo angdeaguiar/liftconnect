@@ -43,13 +43,19 @@ create table user_workouts (
 create table workout_exercises (
     id uuid default public.gen_random_uuid() primary key,
     workout_id uuid not null references user_workouts (id),
-    api_id varchar(36),
-    name varchar(50),
-    sets int,
+    api_id varchar(36) not null,
+    name text,
+    gif_url varchar(150)
+);
+
+create table workout_sets (
+    id uuid default public.gen_random_uuid(),
+    exercise_id uuid not null references workout_exercises (id),
+    set_number int,
     reps int,
     weight int,
-    exercise_order int,
-    gif_url varchar(100)
+
+    primary key (id, exercise_id)
 );
 
 create table posts (
