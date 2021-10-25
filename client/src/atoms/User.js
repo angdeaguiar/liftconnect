@@ -6,7 +6,12 @@ const userState = atom({
         id: '',
 		fname: '',
 		lname: '',
-        city: ''
+        city: '',
+		prs: {
+			squat: 0,
+			deadlift: 0,
+			bench: 0
+		}
 	},
 });
 
