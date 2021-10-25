@@ -69,7 +69,7 @@ func GetExercisesHandler(c *gin.Context) {
 // GetExerciseByTargetHandler handles a GET request for retrieving exercises
 // by a body part from RapidAPI's ExerciseDB API.
 func GetExercisesByTargetHandler(c *gin.Context) {
-	target := "/bodyPart/%7B" + c.Param("target") + "%7D"
+	target := "/bodyPart/" + c.Param("target")
 
 	req, _ := http.NewRequest("GET", RapidAPIURL+target, nil)
 
@@ -94,7 +94,7 @@ func GetExercisesByTargetHandler(c *gin.Context) {
 // GetExercisesByNameHandler handles a GET request for retrieving exercises
 // by a name from RapidAPI's ExerciseDB API.
 func GetExercisesByNameHandler(c *gin.Context) {
-	name := "/name/%7B" + c.Param("name") + "%7D"
+	name := "/name/" + c.Param("name")
 
 	req, _ := http.NewRequest("GET", RapidAPIURL+name, nil)
 
@@ -126,24 +126,36 @@ func CreateWorkoutHandler(c *gin.Context) {
 		return
 	}
 
-	if err := models.DB.Save(&workout); err != nil {
+	if err := models.DB.Create(&workout).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	if len(workout.WorkoutExercises) > 0 {
-		for i, exercise := range workout.WorkoutExercises {
-			if err := models.DB.Create(&models.WorkoutExercise{
-				WorkoutID:     workout.ID,
-				ApiID:         exercise.ApiID,
-				Name:          exercise.Name,
-				Sets:          exercise.Sets,
-				Reps:          exercise.Reps,
-				ExerciseOrder: i,
-				GifURL:        exercise.GifURL,
-			}).Error; err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		for _, exercise := range workout.WorkoutExercises {
+			we := &models.WorkoutExercise{
+				WorkoutID: workout.ID,
+				ApiID:     exercise.ApiID,
+				Name:      exercise.Name,
+				GifURL:    exercise.GifURL,
+			}
+
+			q := models.DB.Create(we)
+			if q.Error != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": q.Error})
 				return
+			}
+
+			for _, set := range exercise.WorkoutSets {
+				if err := models.DB.Create(&models.WorkoutSet{
+					ExerciseID: we.ID,
+					SetNumber:  set.SetNumber,
+					Reps:       set.Reps,
+					Weight:     set.Weight,
+				}).Error; err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err})
+					return
+				}
 			}
 		}
 	}

@@ -260,6 +260,13 @@ func UserHandler(c *gin.Context) {
 		return
 	}
 
+	ups := models.PersonalRecords{}
+	if err := models.DB.Where("user_id = ?", user.ID).Find(&ups).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	user.PersonalRecords = &ups
+
 	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
