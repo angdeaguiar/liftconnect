@@ -13,7 +13,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT")
+		c.Header("Access-Control-Allow-Methods", "POST, HEAD, PATCH, OPTIONS, GET, PUT, DELETE")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
@@ -37,7 +37,7 @@ func main() {
 	// Session
 	router.GET("/self", handlers.UserHandler)
 	router.POST("/self/login", handlers.LoginHandler)
-	router.POST("/self/logout", handlers.LogoutHandler)
+	router.GET("/self/logout", handlers.LogoutHandler)
 
 	api := router.Group("/api")
 
