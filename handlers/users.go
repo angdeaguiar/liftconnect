@@ -85,7 +85,7 @@ func (ca *CookieAccess) SetToken(token string) {
 		Value:    token,
 		HttpOnly: true,
 		Path:     "/",
-		Expires:  time.Now().Add(time.Hour * 4),
+		Expires:  time.Now().Add(time.Hour * -1),
 	})
 }
 
@@ -161,10 +161,10 @@ func RecommendedUserHandler(c *gin.Context) {
 	if err := models.DB.
 		Select("users.*").
 		Joins("left join personal_records on users.id = personal_records.user_id").
-		Joins("left join user_followings on user_followings.following_id = users.id").
+		Joins("left join user_followings on user_followings.following_id = users.id and user_followings.user_id = ?", id).
 		Where("users.id != ?", id).
 		Where("users.city = ?", user.City).
-		Where("user_followings.user_id != ? or user_followings.user_id is null", id).
+		Where("user_followings.following_id is null").
 		Where("(personal_records.bench between ? and ?)"+
 			"or (personal_records.squat between ? and ?)"+
 			"or (personal_records.deadlift between ? and ?)",

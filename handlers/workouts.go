@@ -17,18 +17,26 @@ const RapidAPIHost = "exercisedb.p.rapidapi.com"
 // users workouts.
 func GetWorkoutsByUserHandler(c *gin.Context) {
 	workouts := models.UserWorkouts{}
-	exercises := []*models.WorkoutExercise{}
+	exercises := models.WorkoutExercises{}
 
-	if err := models.DB.Where("user_id = ?", c.Param("id")).Find(workouts).Error; err != nil {
+	sets := []*models.WorkoutSet{}
+
+	if err := models.DB.Where("user_id = ?", c.Param("uid")).Order("created_at desc").Find(&workouts).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	if err := models.DB.
 		Where("workout_id in (?)", workouts.IDs()).
-		Group("workout_id").
-		Order("exercise_order asc").
 		Find(&exercises).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	if err := models.DB.
+		Where("exercise_id in (?)", exercises.IDs()).
+		Order("set_number").
+		Find(&sets).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -37,6 +45,13 @@ func GetWorkoutsByUserHandler(c *gin.Context) {
 	for _, exercise := range exercises {
 		if w, ok := m[exercise.WorkoutID]; ok {
 			w.WorkoutExercises = append(w.WorkoutExercises, exercise)
+		}
+	}
+
+	me := exercises.Map()
+	for _, set := range sets {
+		if w, ok := me[set.ExerciseID]; ok {
+			w.WorkoutSets = append(w.WorkoutSets, set)
 		}
 	}
 

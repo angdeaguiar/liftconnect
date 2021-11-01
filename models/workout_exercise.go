@@ -10,3 +10,22 @@ type WorkoutExercise struct {
 
 	WorkoutSets []*WorkoutSet `json:"workout_sets" sql:"-"`
 }
+
+// WorkoutExercise is a slice of a the exercises in a workout.
+type WorkoutExercises []*WorkoutExercise
+
+func (we WorkoutExercises) IDs() []string {
+	ids := make([]string, len(we))
+	for i, w := range we {
+		ids[i] = w.ID
+	}
+	return ids
+}
+
+func (we WorkoutExercises) Map() map[string]*WorkoutExercise {
+	m := make(map[string]*WorkoutExercise, len(we))
+	for i, w := range we {
+		m[w.ID] = we[i]
+	}
+	return m
+}
