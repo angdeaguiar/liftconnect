@@ -22,23 +22,25 @@ const CreatePost = (props) => {
 
     return (
         <section id="post-something">
-            <div>
+            <div className="ps-container">
                 <input
                     id="create-post-title"
-                    placeholder="Post title"
+                    placeholder="Post title..."
                     value={title}
                     onChange={e => setTitle(e.target.value)}
+                    className="ps-input"
                 />
                 <textarea
                     id="post-text-area"
-                    placeholder="Start typing to create post..."
+                    placeholder="Post content..."
                     rows="6"
                     onChange={e => setContent(e.target.value)}
                     value={content}
+                    className="ps-textarea"
                 >
                 </textarea>
+                <button className="ps-button" onClick={createPost}>Submit Post</button>
             </div>
-            <button onClick={createPost}>Post Something</button>
         </section>
     );
 };

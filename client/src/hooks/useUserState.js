@@ -14,9 +14,12 @@ export default (() => {
 		...props,
 	});
 
+	const resetProperties = () => setUser({});
+
 	return {
         user,
         updateProperty,
         updateProperties,
+		resetProperties,
 	};
 });

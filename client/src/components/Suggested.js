@@ -24,18 +24,23 @@ const Suggested = () => {
     }
 
     return (
-        <>
+        <div className="suggested-container">
+            <div className="prs-title">Suggested Users</div>
             {users && users.map(u => (
-                <div>
-                    <br />
-                    <br />
-                    <br />
-                    <h3>Suggested Users</h3>
-                    <p>{u.first_name + " " + u.last_name + " (" + u.pronouns + ")"}</p>
-                    <button onClick={() => followUser(u.id)}>Follow</button>
+                <div className="suggested-user">
+                    <div className="suggested-name">
+                        <p>{u.first_name + " " + u.last_name + " (" + u.pronouns + ")"}</p>
+                        <p>{u.city}</p>
+                    </div>
+                    <button
+                        className="no-style-btn"
+                        onClick={() => followUser(u.id)}
+                    >
+                        <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
+                    </button>
                 </div>
             ))}
-        </>
+        </div>
     );
 };
 
