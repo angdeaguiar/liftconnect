@@ -19,6 +19,8 @@ import (
 const WeightVariation = 20
 const SecretKey = "secret"
 
+// UserFollow is a helper struct to determine whether a user is following
+// another user.
 type UserFollow struct {
 	models.User
 	Following bool `json:"following"`
@@ -36,6 +38,7 @@ func GetUserHandler(c *gin.Context) {
 			"(select 1 from user_followings where user_id = ? and following_id = users.id)"+
 			"as following", c.Param("id")).
 		Where("users.first_name like ?", filter).
+		Where("users.id != ?", c.Param("id")).
 		Scan(&users).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -72,21 +75,6 @@ func RegisterUserHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": user})
-}
-
-type CookieAccess struct {
-	Writer http.ResponseWriter
-}
-
-// method to write cookie
-func (ca *CookieAccess) SetToken(token string) {
-	http.SetCookie(ca.Writer, &http.Cookie{
-		Name:     "jwt",
-		Value:    token,
-		HttpOnly: true,
-		Path:     "/",
-		Expires:  time.Now().Add(time.Hour * -1),
-	})
 }
 
 // UserLogin is a model representing the credentials a user needs to login

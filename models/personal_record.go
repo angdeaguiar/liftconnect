@@ -1,6 +1,6 @@
 package models
 
-// PersonalRecords represents a single record of a users personal records
+// PersonalRecords represents a single record of a users personal records.
 type PersonalRecords struct {
 	ID       string `json:"id"`
 	UserID   string `json:"user_id"`

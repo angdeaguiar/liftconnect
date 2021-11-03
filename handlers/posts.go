@@ -113,7 +113,7 @@ func DeleteCommentHandler(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// mapUserToPost
+// mapUserToPost associates a user with a gien post.
 func mapUserToPost(post *models.Post) error {
 	user := models.User{}
 	if err := models.DB.Where("id = ?", post.UserID).Find(&user).Error; err != nil {
@@ -125,7 +125,7 @@ func mapUserToPost(post *models.Post) error {
 	return nil
 }
 
-// mapUserToComment
+// mapUserToComment associates a user to a given comment.
 func mapUserToComment(comment *models.Comment) error {
 	user := models.User{}
 	if err := models.DB.Where("id = ?", comment.UserID).Find(&user).Error; err != nil {

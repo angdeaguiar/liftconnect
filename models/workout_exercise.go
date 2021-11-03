@@ -14,6 +14,7 @@ type WorkoutExercise struct {
 // WorkoutExercise is a slice of a the exercises in a workout.
 type WorkoutExercises []*WorkoutExercise
 
+// IDs returns a slice of id's from WorkoutExercises
 func (we WorkoutExercises) IDs() []string {
 	ids := make([]string, len(we))
 	for i, w := range we {
@@ -22,6 +23,7 @@ func (we WorkoutExercises) IDs() []string {
 	return ids
 }
 
+// Map creates a map of WorkoutExercises.
 func (we WorkoutExercises) Map() map[string]*WorkoutExercise {
 	m := make(map[string]*WorkoutExercise, len(we))
 	for i, w := range we {

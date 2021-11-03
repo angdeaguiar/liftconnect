@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-// Post represents a single post within the application
+// Post represents a single post within the application.
 type Post struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"user_id"`

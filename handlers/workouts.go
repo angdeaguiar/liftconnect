@@ -84,7 +84,7 @@ func GetExercisesHandler(c *gin.Context) {
 // GetExerciseByTargetHandler handles a GET request for retrieving exercises
 // by a body part from RapidAPI's ExerciseDB API.
 func GetExercisesByTargetHandler(c *gin.Context) {
-	target := "/bodyPart/" + c.Param("target")
+	target := "/target/" + c.Param("target")
 
 	req, _ := http.NewRequest("GET", RapidAPIURL+target, nil)
 

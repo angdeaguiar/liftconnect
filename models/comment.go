@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-// Comment represents a single comment on a post
+// Comment represents a single comment on a post.
 type Comment struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"user_id"`
