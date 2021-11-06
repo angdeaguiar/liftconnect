@@ -36,7 +36,7 @@ const Suggested = () => {
                         className="no-style-btn"
                         onClick={() => followUser(u.id)}
                     >
-                        <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
+                        <i className="fa fa-user-plus fa-2x" aria-hidden="true"></i>
                     </button>
                 </div>
             ))}

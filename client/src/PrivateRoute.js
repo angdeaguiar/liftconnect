@@ -8,6 +8,7 @@ function PrivateRoute({ component: Component, ...rest }) {
     const {user, updateProperties} = useUserState();
 
     const [loading, setLoading] = useState(false);
+    // const [error, setError] = useState(false);
 
     useEffect(() => {
         axios.get('http://localhost:8080/self', { withCredentials: true }).then(res => {
@@ -19,6 +20,7 @@ function PrivateRoute({ component: Component, ...rest }) {
             });
             setLoading(true);
         });
+    // eslint-disable-next-line
     }, [user.id]);
 
     return (

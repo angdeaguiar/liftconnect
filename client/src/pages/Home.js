@@ -1,7 +1,10 @@
 
+// External
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import {Redirect} from "react-router-dom";
+import axios from 'axios';
+
+// Internal
 import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
 import useUserState from '../hooks/useUserState'
@@ -37,8 +40,14 @@ const Home = () => {
                     <Post post={post} submit={setSubmit} />
                 ))}
             </div>
-            <div className="right">
-                <button className="create-workout-btn" onClick={() => setRedirect(true)}>Create Workout</button>
+            <div className="right-lane">
+                <button
+                    id="create-workout-btn"
+                    className="create-workout-btn"
+                    onClick={() => setRedirect(true)}
+                >
+                    Create Workout
+                </button>
                 <PersonalRecords />
                 <Suggested />
             </div>

@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Redirect } from "react-router-dom";
 import axios from 'axios';
 
+import useUserState from '../hooks/useUserState';
+
 const Login = () => {
+    const {updateProperties} = useUserState();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [redirect, setRedirect] = useState(false);
@@ -13,7 +17,19 @@ const Login = () => {
             email,
             password
         }, { withCredentials: true })
-        .then(() => setRedirect(true))
+        .then(() => {
+            setRedirect(true)
+            axios.get('http://localhost:8080/self', { withCredentials: true }).then(res => {
+                updateProperties({
+                    id: res.data.data.id,
+                    fname: res.data.data.first_name,
+                    lname: res.data.data.last_name,
+                    prs: res.data.data.personal_records,
+                });
+                //setLoading(true);
+
+            });
+        })
         .catch((err) => setError(err));
     }
 

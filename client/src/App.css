@@ -2,6 +2,9 @@
   text-align: center;
 }
 
+html, body {
+  background-color: #F0F0F0;
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -130,7 +133,7 @@
   margin-left: 250px;
 }
 
-.right {
+.right-lane {
  flex: 25%;
 }
 
@@ -156,18 +159,26 @@
 
 .search-exercises {
   float: left;
-  height: 40px;
-  font-size: 18px;
+  height: 50px;
+  font-size: 16px;
   margin-bottom: 20px;
-  width: 100%;
+  width: 49%;
+  background-color: #F0F0F0;
+  outline: none;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
 }
 
 .exercises-container {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-  width: 50%;
-  padding: 40px 80px;
+  width: 45%;
+  padding: 20px 20px;
+  margin-top: 40px;
+  margin-left: 80px;
+  background-color: white;
+  border: 2px solid lightgrey;
+  border-radius: 5px;
+  height: 100%;
 }
 
 .create-container {
@@ -178,10 +189,29 @@
 .exercise {
   width: 100%;
   margin: 10px 0px;
+  padding: 10px;
   border: solid 1px lightgrey;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+}
+
+.ex-title {
+  width: 30%;
+}
+
+.sets {
+  width: 70%
+}
+
+.sets input[type=number] {
+  background-color: #F0F0F0;
+  width: 80%;
+  text-align: center;
+  border: none;
+  border-radius: 5px;
+  height: 30px;
+  outline: none;
 }
 
 .search {
@@ -195,6 +225,10 @@
   border-radius: 5px;
 }
 
+table {
+  width: 100%;
+}
+
 .search-bar {
   display: flex;
   flex-direction: column;
@@ -203,6 +237,10 @@
 .search-container {
   display: flex;
   flex-direction: column;
+  background-color: white;
+  border: 2px solid lightgrey;
+  border-radius: 5px;
+  padding: 25px;
 }
 
 .search-bar-container {
@@ -332,6 +370,7 @@
   border: 2px solid lightgrey;
   border-radius: 2px;
   padding: 10px;
+  width: 100%;
 }
 
 .ps-textarea {
@@ -348,10 +387,6 @@
 
 }
 
-.ps-input::placeholder, .ps-textarea::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: 	#D0D0D0;
-  opacity: 1; /* Firefox */
-}
 
 .ps-button {
   width: 20% !important;
@@ -367,7 +402,7 @@
   font-size: 28px;
   font-weight: 5;
   color: 	#585858;
-  margin-top: 30px;
+  padding-top: 40px;
   margin-bottom: 10px;
 }
 
@@ -413,8 +448,9 @@
   border: none;
   outline: none;
   border-radius: 5px;
-  width: 50px;
+  width: 65px;
   height: 35px;
+  text-align: center;
 }
 
 .prs-btn {
@@ -532,7 +568,7 @@ p {
 }
 
 .cmt-container {
-  margin: 10px 0;
+  margin: 0 0 10px 0;
   flex-direction: column;
   display: flex;
   align-items: flex-start;
@@ -547,6 +583,50 @@ p {
   flex-direction: row;
   align-items: flex-start;
 }
+
+.workout-container {
+  height: inherit;
+  margin: 50px 250px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.workout-card {
+  padding: 15px;
+  height: inherit;
+  margin: 10px;
+}
+
+.workout-dropdown {
+  height: 50px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color:gray;
+  background-color: white;
+  outline: none;
+  border: 2px solid lightgrey;
+  border-radius: 5px;
+  padding: 10px;
+  width: 49%;
+}
+
+.filter-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.icon-red {
+  color: red;
+}
+
+a {
+  text-decoration: underline;
+}
+
 
 main {
   background-color: #F0F0F0;

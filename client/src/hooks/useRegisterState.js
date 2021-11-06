@@ -1,7 +1,7 @@
 import { useRecoilState } from 'recoil';
 import registerState from '../atoms/Register';
 
-export default (() => {
+const useRegiserState = () => {
 	const [register, setRegister] = useRecoilState(registerState);
 
     const updateProperty = (key, value) => setRegister({
@@ -19,4 +19,6 @@ export default (() => {
         updateProperty,
         updateProperties,
 	};
-});
+};
+
+export default useRegiserState;

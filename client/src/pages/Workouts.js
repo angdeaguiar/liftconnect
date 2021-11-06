@@ -1,14 +1,16 @@
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import WorkoutCard from '../components/WorkoutCard'
 
-const Workouts = (props) => {
+const Workouts = () => {
 
     return (
-        <div>
-            Workouts Page
-            <WorkoutCard />
-        </div>
+        <>
+        <div className="greeting">Saved Workouts</div>
+            <div className="workout-container">
+                <WorkoutCard />
+            </div>
+        </>
     );
 };
 

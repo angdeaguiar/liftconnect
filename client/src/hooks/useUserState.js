@@ -1,7 +1,7 @@
 import { useRecoilState } from 'recoil';
 import userState from '../atoms/User';
 
-export default (() => {
+const useUserState = () => {
 	const [user, setUser] = useRecoilState(userState);
 
     const updateProperty = (key, value) => setUser({
@@ -22,4 +22,6 @@ export default (() => {
         updateProperties,
 		resetProperties,
 	};
-});
+};
+
+export default useUserState;

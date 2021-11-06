@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import ExerciseList from '../components/ExerciseList';
 
-const Create = (props) => {
+const Create = () => {
 
     return (
         <div>

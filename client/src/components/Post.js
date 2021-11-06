@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import useUserState from '../hooks/useUserState'
 
-const OPTIONS = { month: "long", day: "numeric" }
+const OPTIONS = { month: "long", day: "numeric", year: 'numeric'}
 
 const Post = (props) => {
     const {user} = useUserState();
@@ -48,17 +48,20 @@ const Post = (props) => {
 
     return (
         <div className="card card-container">
+            {error && (
+                <p>An error occurred</p>
+            )}
             <div className="card-body">
                 <div className="header-container">
                     <div className="fix">
-                        <img className="img-user" src="https://capenetworks.com/static/images/testimonials/user-icon.svg" />
+                        <img alt="Profile" className="img-user" src="https://capenetworks.com/static/images/testimonials/user-icon.svg" />
                         <div className="header">
                             <div className="name">{props.post.user.first_name + " " + props.post.user.last_name}</div>
                             <p>{setDate(props.post.created_at)}</p>
                         </div>
                     </div>
                     {user.id === props.post.user_id && (
-                        <button className="no-style-btn" onClick={() => removePost(props.post.id)}><i class="fa fa-trash fa-lg" aria-hidden="true"></i></button>
+                        <button className="no-style-btn" onClick={() => removePost(props.post.id)}><i className="fa fa-trash fa-lg" aria-hidden="true"></i></button>
                     )}
                 </div>
                 <div className="content-container">
@@ -71,14 +74,14 @@ const Post = (props) => {
                     <div className="cmt-container">
                         <div className="header-container">
                             <div className="fix">
-                                <img className="cmt-img-user" src="https://capenetworks.com/static/images/testimonials/user-icon.svg" />
+                                <img alt="Profile" className="cmt-img-user" src="https://capenetworks.com/static/images/testimonials/user-icon.svg" />
                                 <div className="header">
                                     <p className="less-btm">{comment.user.first_name + " " + comment.user.last_name}</p>
                                     <div>{setDate(comment.created_at)}</div>
                                 </div>
                             </div>
                             {user.id === comment.user_id && (
-                                <button className="no-style-btn" onClick={() => removeComment(comment.id)}><i class="fa fa-trash fa-lg" aria-hidden="true"></i></button>
+                                <button className="no-style-btn" onClick={() => removeComment(comment.id)}><i className="fa fa-trash fa-lg" aria-hidden="true"></i></button>
                             )}
                         </div>
                         <div className="cmt-container">

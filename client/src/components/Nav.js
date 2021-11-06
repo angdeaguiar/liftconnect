@@ -5,7 +5,7 @@ import axios from 'axios';
 import useUserState from '../hooks/useUserState'
 
 const Nav = () => {
-    const {user} = useUserState();
+    const {user, updateProperty} = useUserState();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
@@ -13,11 +13,16 @@ const Nav = () => {
     let menu;
 
     const logout = () => {
-        axios.get('http://localhost:8080/self/logout', { withCredentials: true });
+        axios.get('http://localhost:8080/self/logout', { withCredentials: true }).then(() => {
+            updateProperty('id', null);
+        });
     };
 
     const followUser = (id) => {
-
+        axios.post(`http://localhost:8080/api/users/${user.id}/follow/${id}`,
+        { withCredentials: true }).then(() => {
+            setSearchTerm('');
+        });
     }
 
     useEffect(() => {
@@ -33,11 +38,11 @@ const Nav = () => {
         }, 250)
 
         return () => clearTimeout(delayDebounceFn)
-    }, [searchTerm]);
+    }, [searchTerm, user.id]);
 
     if (!user.id) {
         menu = (
-            <ul className="navbar-nav me-auto mb-2 mb-md-0">
+            <ul className="navbar-nav me-auto mb-2 mb-md-0 nav-container">
                 <li className="nav-item active">
                     <Link to="/register" className="nav-link nav-title">Register</Link>
                 </li>
@@ -83,12 +88,14 @@ const Nav = () => {
                     {users.map(u => (
                         <div className="user-search">
                             {u.first_name + " " + u.last_name}
-                            <button
-                                onClick={() => followUser(user.id)}
-                                className="no-style-btn"
-                            >
-                                <i class="fa fa-user-plus" aria-hidden="true"></i>
-                            </button>
+                            {!u.following && (
+                                <button
+                                    onClick={() => followUser(u.id)}
+                                    className="no-style-btn"
+                                >
+                                    <i className="fa fa-user-plus" aria-hidden="true"></i>
+                                </button>
+                            )}
                         </div>
                     ))}
                 </div>
