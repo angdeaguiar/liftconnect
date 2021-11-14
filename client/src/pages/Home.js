@@ -1,10 +1,10 @@
 
-// External
+// External Imports
 import React, {useEffect, useState} from 'react';
 import {Redirect} from "react-router-dom";
 import axios from 'axios';
 
-// Internal
+// Internal Imports
 import CreatePost from '../components/CreatePost';
 import Post from '../components/Post';
 import useUserState from '../hooks/useUserState'

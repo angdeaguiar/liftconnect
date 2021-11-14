@@ -1,7 +1,9 @@
+// External Imports
 import React, { useEffect, useState } from 'react';
 import {Link} from "react-router-dom";
 import axios from 'axios';
 
+// Internal Imports
 import useUserState from '../hooks/useUserState'
 
 const Nav = () => {
@@ -10,6 +12,7 @@ const Nav = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
 
+    const pathname = window.location.pathname;
     let menu;
 
     const logout = () => {
@@ -23,7 +26,7 @@ const Nav = () => {
         { withCredentials: true }).then(() => {
             setSearchTerm('');
         });
-    }
+    };
 
     useEffect(() => {
         if (searchTerm === '') {
@@ -40,7 +43,7 @@ const Nav = () => {
         return () => clearTimeout(delayDebounceFn)
     }, [searchTerm, user.id]);
 
-    if (!user.id) {
+    if (!user.id || pathname === "/") {
         menu = (
             <ul className="navbar-nav me-auto mb-2 mb-md-0 nav-container">
                 <li className="nav-item active">

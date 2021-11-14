@@ -1,7 +1,9 @@
+// External Imports
 import React, { useState } from 'react';
 import { Redirect } from "react-router-dom";
 import axios from 'axios';
 
+// Internal Imports
 import useUserState from '../hooks/useUserState';
 
 const Login = () => {
@@ -26,8 +28,6 @@ const Login = () => {
                     lname: res.data.data.last_name,
                     prs: res.data.data.personal_records,
                 });
-                //setLoading(true);
-
             });
         })
         .catch((err) => setError(err));

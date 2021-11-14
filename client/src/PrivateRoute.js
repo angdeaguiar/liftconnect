@@ -1,14 +1,15 @@
+// External Imports
 import React, { useEffect, useState } from 'react'
 import { Route, Redirect } from 'react-router-dom';
 import axios from 'axios';
 
+// Internal Imports
 import useUserState from './hooks/useUserState';
 
 function PrivateRoute({ component: Component, ...rest }) {
     const {user, updateProperties} = useUserState();
 
     const [loading, setLoading] = useState(false);
-    // const [error, setError] = useState(false);
 
     useEffect(() => {
         axios.get('http://localhost:8080/self', { withCredentials: true }).then(res => {

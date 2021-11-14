@@ -1,4 +1,7 @@
+// External Imports
 import { useRecoilState } from 'recoil';
+
+// Internal Imports
 import userState from '../atoms/User';
 
 const useUserState = () => {

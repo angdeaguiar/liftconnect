@@ -1,7 +1,9 @@
+// External Imports
 import React, {useState} from 'react';
 import {Redirect} from 'react-router-dom';
 import axios from 'axios';
 
+// Internal Imports
 import useRegisterState from '../hooks/useRegisterState';
 
 const Register = () => {
@@ -21,7 +23,7 @@ const Register = () => {
         }, { withCredentials: true })
         .then(() => setRedirect(true))
         .catch((err) => setError(err))
-    }
+    };
 
     if (redirect) {
         return <Redirect to="/"/>;

@@ -1,50 +1,29 @@
+// External Imports
 import React, { useState } from 'react';
 import axios from 'axios';
 
-import useUserState from '../hooks/useUserState'
+// Internal Imports
+import useUserState from '../hooks/useUserState';
+import Comment from './Comment';
 
-const OPTIONS = { month: "long", day: "numeric", year: 'numeric'}
+const OPTIONS = { month: "long", day: "numeric", year: 'numeric'};
 
 const Post = (props) => {
     const {user} = useUserState();
 
-    const [content, setContent] = useState('');
     const [error, setError] = useState('');
 
     const setDate = (date) => {
-        return new Date(date).toLocaleString("en", OPTIONS)
+        return new Date(date).toLocaleString("en", OPTIONS);
     };
-
-    const createComment = () => {
-        axios.post('http://localhost:8080/api/posts/comment', {
-            post_id: props.post.id,
-            user_id: user.id,
-            content
-        }, { withCredentials: true })
-        .then(() => {
-            setContent('');
-            props.submit(true);
-        })
-        .catch((err) => setError(err));
-    };
-
-    const removeComment = (id) => {
-        axios.delete(`http://localhost:8080/api/posts/comment/${id}`, { withCredentials: true })
-        .then(() => {
-            setContent('');
-            props.submit(true);
-        })
-        .catch((err) => setError(err));
-    }
 
     const removePost = (id) => {
         axios.delete(`http://localhost:8080/api/posts/${id}`, { withCredentials: true })
         .then(() => {
-            setContent('');
             props.submit(true);
         })
         .catch((err) => setError(err));
-    }
+    };
 
     return (
         <div className="card card-container">
@@ -67,38 +46,17 @@ const Post = (props) => {
                 <div className="content-container">
                     <h2 className="card-title">{props.post.title}</h2>
                     <p className="card-text">{props.post.content}</p>
+                    {props.post.file_id && props.post.file.file_type === "image" && (
+                        <img src={props.post.file.s3_url} alt="post" />
+                    )}
+                    {props.post.file_id && props.post.file.file_type === "video" && (
+                        <video className="video" controls>
+                            <source src={props.post.file.s3_url} type="video/mp4"></source>
+                        </video>
+                    )}
                 </div>
             </div>
-            <div className="card-footer footer-container">
-                {props.post.comments && props.post.comments.map(comment => (
-                    <div className="cmt-container">
-                        <div className="header-container">
-                            <div className="fix">
-                                <img alt="Profile" className="cmt-img-user" src="https://capenetworks.com/static/images/testimonials/user-icon.svg" />
-                                <div className="header">
-                                    <p className="less-btm">{comment.user.first_name + " " + comment.user.last_name}</p>
-                                    <div>{setDate(comment.created_at)}</div>
-                                </div>
-                            </div>
-                            {user.id === comment.user_id && (
-                                <button className="no-style-btn" onClick={() => removeComment(comment.id)}><i className="fa fa-trash fa-lg" aria-hidden="true"></i></button>
-                            )}
-                        </div>
-                        <div className="cmt-container">
-                            <p>{comment.content}</p>
-                        </div>
-                    </div>
-                ))}
-                <textarea
-                    id="post-text-area"
-                    className="textarea"
-                    placeholder="Add comment..."
-                    onChange={e => setContent(e.target.value)}
-                    value={content}
-                >
-                </textarea>
-                <button className="cmt-btn" onClick={createComment}>Comment</button>
-            </div>
+            <Comment comments={props.post.comments} setError={setError} />
         </div>
     );
 };

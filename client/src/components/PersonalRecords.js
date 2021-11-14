@@ -1,4 +1,4 @@
-
+// External Imports
 import React from 'react';
 import useUserState from '../hooks/useUserState';
 import axios from 'axios';
@@ -20,15 +20,15 @@ const PersonalRecords = () => {
 
     const handleSquat = (value) => {
         updateProperty("prs", {squat: parseInt(value), deadlift: user.prs.deadlift, bench: user.prs.bench});
-    }
+    };
 
     const handleDeadlift = (value) => {
         updateProperty("prs", {squat: user.prs.squat, deadlift: parseInt(value), bench: user.prs.bench});
-    }
+    };
 
     const handleBench = (value) => {
         updateProperty("prs", {squat: user.prs.squat, deadlift: user.prs.deadlift, bench: parseInt(value)});
-    }
+    };
 
     return (
         <div className="prs-container">
