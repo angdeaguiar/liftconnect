@@ -1,11 +1,22 @@
 package main
 
 import (
+	"log"
+	"os"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 
 	"github.com/liftconnect/handlers"
 	"github.com/liftconnect/models"
 )
+
+var AccessKeyID string
+var SecretAccessKey string
+var MyRegion string
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -23,12 +34,54 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
+func LoadEnv() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+		return
+	}
+}
+
+func GetEnvWithKey(key string) string {
+	return os.Getenv(key)
+}
+
+func ConnectAws() *session.Session {
+	AccessKeyID = GetEnvWithKey("AWS_ACCESS_KEY_ID")
+	SecretAccessKey = GetEnvWithKey("AWS_SECRET_ACCESS_KEY")
+	MyRegion = GetEnvWithKey("AWS_REGION")
+
+	sess, err := session.NewSession(
+		&aws.Config{
+			Region: aws.String(MyRegion),
+			Credentials: credentials.NewStaticCredentials(
+				AccessKeyID,
+				SecretAccessKey,
+				"", // a token will be created when the session it's used.
+			),
+		})
+
+	if err != nil {
+		log.Fatalf("Unable to create AWS session")
+	}
+
+	return sess
+}
+
 func main() {
+	LoadEnv()
+
+	sess := ConnectAws()
+
 	// Set the router as the default one shipped with Gin
 	router := gin.Default()
 
 	// Configure Cors
 	router.Use(CORSMiddleware())
+	router.Use(func(c *gin.Context) {
+		c.Set("sess", sess)
+		c.Next()
+	})
 
 	// Setup route group for the API
 	models.ConnectDataBase()
@@ -52,6 +105,7 @@ func main() {
 	api.GET("/posts/:id", handlers.GetPostsByUserHandler)
 	api.POST("/posts", handlers.CreatePostHandler)
 	api.POST("/posts/comment", handlers.CreateCommentHandler)
+	api.POST("/posts/upload/:type", handlers.UploadFileHandler)
 	api.DELETE("/posts/:id", handlers.DeletePostHandler)
 	api.DELETE("posts/comment/:id", handlers.DeleteCommentHandler)
 
