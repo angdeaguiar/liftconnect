@@ -7,6 +7,8 @@ type Post struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"user_id"`
 	User      *User     `json:"user" sql:"-"`
+	FileID    string    `json:"file_id,omitempty"`
+	File      *File     `json:"file" sql:"-"`
 	Title     string    `json:"title"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"created_at"`

@@ -58,9 +58,18 @@ create table workout_sets (
     primary key (id, exercise_id)
 );
 
+create table files (
+    id uuid default public.gen_random_uuid() primary key,
+    filename text not null,
+    s3_url text not null,
+    file_type varchar(10),
+    size numeric
+);
+
 create table posts (
     id uuid default public.gen_random_uuid() primary key,
     user_id uuid not null references users (id),
+    file_id uuid references files (id),
     title varchar(50),
     content text,
     created_at timestamptz default now()

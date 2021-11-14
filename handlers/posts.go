@@ -2,11 +2,18 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/liftconnect/models"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
+
+var filepath string
 
 // GetPostsByUserHandler handles a GET request for retrieving posts
 // by a given user.
@@ -28,8 +35,15 @@ func GetPostsByUserHandler(c *gin.Context) {
 
 	for _, post := range posts {
 		if err := mapUserToPost(post); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "unable to fetch user for posts"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unable to fetch user for post"})
 			return
+		}
+
+		if len(post.FileID) > 0 {
+			if err := mapFileToPost(post); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "unable to fetch a file for post"})
+				return
+			}
 		}
 	}
 
@@ -113,6 +127,53 @@ func DeleteCommentHandler(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// UploadFileHandler handles a post reqest for uploading a file to s3 for a post.
+func UploadFileHandler(c *gin.Context) {
+	sess := c.MustGet("sess").(*session.Session)
+	uploader := s3manager.NewUploader(sess)
+
+	bucket := os.Getenv("BUCKET_NAME")
+
+	file, header, err := c.Request.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	filename := header.Filename
+
+	upload, err := uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(bucket),
+		ACL:    aws.String("public-read"),
+		Key:    aws.String(filename),
+		Body:   file,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":    "Failed to upload file",
+			"uploader": upload,
+		})
+
+		return
+	}
+
+	filepath = "https://" + bucket + "." + "s3-us-east-2.amazonaws.com/" + filename
+
+	f := models.File{
+		Filename: filename,
+		S3URL:    filepath,
+		FileType: c.Param("type"),
+		Size:     float64(header.Size),
+	}
+
+	if err := models.DB.Create(&f).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": f})
+}
+
 // mapUserToPost associates a user with a gien post.
 func mapUserToPost(post *models.Post) error {
 	user := models.User{}
@@ -121,6 +182,18 @@ func mapUserToPost(post *models.Post) error {
 	}
 
 	post.User = &user
+
+	return nil
+}
+
+// mapUserToPost associates a file with a gien post.
+func mapFileToPost(post *models.Post) error {
+	file := models.File{}
+	if err := models.DB.Where("id = ?", post.FileID).Find(&file).Error; err != nil {
+		return err
+	}
+
+	post.File = &file
 
 	return nil
 }
