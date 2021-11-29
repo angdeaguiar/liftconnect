@@ -70,7 +70,7 @@ const CreatePost = (props) => {
                    <input type="file" id="file" name="post-file" accept={acceptedMedia} onChange={uploadHandler}></input>
                 )}
                 <div className="post-footer">
-                    <button className="no-style-btn" onClick={() => setExpand(!expand)}><i class="fa fa-upload fa-2x icon-grey"></i></button>
+                    <button className="no-style-btn" onClick={() => setExpand(!expand)}><i className="fa fa-upload fa-2x icon-grey"></i></button>
                     <button className="ps-button" onClick={submit}>Submit Post</button>
                 </div>
             </div>

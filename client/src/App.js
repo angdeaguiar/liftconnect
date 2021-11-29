@@ -20,7 +20,6 @@ function App() {
               <BrowserRouter>
                   <Nav />
                   <main>
-
                       <Route exact path="/" component={() => <Login />}/>
                       <Route path="/register" component={() => <Register />} />
                       <PrivateRoute path="/home" component={Home}/>

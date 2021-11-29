@@ -19,22 +19,40 @@ const PersonalRecords = () => {
     };
 
     const handleSquat = (value) => {
-        updateProperty("prs", {squat: parseInt(value), deadlift: user.prs.deadlift, bench: user.prs.bench});
+        updateProperty("prs", {
+            id: user.prs.id,
+            user_id: user.id,
+            squat: parseInt(value),
+            deadlift: user.prs.deadlift,
+            bench: user.prs.bench
+        });
     };
 
     const handleDeadlift = (value) => {
-        updateProperty("prs", {squat: user.prs.squat, deadlift: parseInt(value), bench: user.prs.bench});
+        updateProperty("prs", {
+            id: user.prs.id,
+            user_id: user.id,
+            squat: user.prs.squat,
+            deadlift: parseInt(value),
+            bench: user.prs.bench
+        });
     };
 
     const handleBench = (value) => {
-        updateProperty("prs", {squat: user.prs.squat, deadlift: user.prs.deadlift, bench: parseInt(value)});
+        updateProperty("prs", {
+            id: user.prs.id,
+            user_id: user.id,
+            squat: user.prs.squat,
+            deadlift: user.prs.deadlift,
+            bench: parseInt(value)
+        });
     };
 
     return (
         <div className="prs-container">
             <div className="prs-title">Personal Records</div>
             <div className="input-prs">
-                <label className="prs-label" for="squat">Squat</label>
+                <label className="prs-label" htmlFor="squat">Squat</label>
                 <input
                     type="number"
                     id="squat"
@@ -44,7 +62,7 @@ const PersonalRecords = () => {
                 />
             </div>
             <div className="input-prs">
-                <label className="prs-label" for="deadlift">Deadlift</label>
+                <label className="prs-label" htmlFor="deadlift">Deadlift</label>
                 <input
                     type="number"
                     id="deadlift"
@@ -54,7 +72,7 @@ const PersonalRecords = () => {
                 />
             </div>
             <div className="input-prs">
-                <label className="prs-label" for="bench">Bench</label>
+                <label className="prs-label" htmlFor="bench">Bench</label>
                 <input
                     type="number"
                     id="bench"
