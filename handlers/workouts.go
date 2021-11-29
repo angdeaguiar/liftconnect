@@ -3,15 +3,12 @@ package handlers
 import (
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/liftconnect/models"
 )
-
-const RapidAPIURL = "https://exercisedb.p.rapidapi.com/exercises"
-const RapidAPIKey = "f565efb29bmsh082cbc3f9d47ae5p10610ejsn44d0b8c6b33d"
-const RapidAPIHost = "exercisedb.p.rapidapi.com"
 
 // GetWorkoutsByUserHandler handles a GET request for retrieving a given
 // users workouts.
@@ -61,10 +58,10 @@ func GetWorkoutsByUserHandler(c *gin.Context) {
 // GetExercisesHandler handles a GET request for retrieving all the
 // exercises from RapidAPI's ExerciseDB API.
 func GetExercisesHandler(c *gin.Context) {
-	req, _ := http.NewRequest("GET", RapidAPIURL, nil)
+	req, _ := http.NewRequest("GET", getEnvWithKey("RAPID_API_URL"), nil)
 
-	req.Header.Add("x-rapidapi-host", RapidAPIHost)
-	req.Header.Add("x-rapidapi-key", RapidAPIKey)
+	req.Header.Add("x-rapidapi-host", getEnvWithKey("RAPID_API_HOST"))
+	req.Header.Add("x-rapidapi-key", getEnvWithKey("RAPID_API_KEY"))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -86,10 +83,10 @@ func GetExercisesHandler(c *gin.Context) {
 func GetExercisesByTargetHandler(c *gin.Context) {
 	target := "/target/" + c.Param("target")
 
-	req, _ := http.NewRequest("GET", RapidAPIURL+target, nil)
+	req, _ := http.NewRequest("GET", getEnvWithKey("RAPID_API_URL")+target, nil)
 
-	req.Header.Add("x-rapidapi-host", RapidAPIHost)
-	req.Header.Add("x-rapidapi-key", RapidAPIKey)
+	req.Header.Add("x-rapidapi-host", getEnvWithKey("RAPID_API_HOST"))
+	req.Header.Add("x-rapidapi-key", getEnvWithKey("RAPID_API_KEY"))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -111,10 +108,10 @@ func GetExercisesByTargetHandler(c *gin.Context) {
 func GetExercisesByNameHandler(c *gin.Context) {
 	name := "/name/" + c.Param("name")
 
-	req, _ := http.NewRequest("GET", RapidAPIURL+name, nil)
+	req, _ := http.NewRequest("GET", getEnvWithKey("RAPID_API_URL")+name, nil)
 
-	req.Header.Add("x-rapidapi-host", RapidAPIHost)
-	req.Header.Add("x-rapidapi-key", RapidAPIKey)
+	req.Header.Add("x-rapidapi-host", getEnvWithKey("RAPID_API_HOST"))
+	req.Header.Add("x-rapidapi-key", getEnvWithKey("RAPID_API_KEY"))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -176,4 +173,8 @@ func CreateWorkoutHandler(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func getEnvWithKey(key string) string {
+	return os.Getenv(key)
 }

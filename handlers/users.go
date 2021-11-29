@@ -89,8 +89,6 @@ func LoginHandler(c *gin.Context) {
 	credentials := UserLogin{}
 	user := models.User{}
 
-	// ca := &CookieAccess{Writer: c.Writer}
-
 	if err := c.ShouldBindJSON(&credentials); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return

@@ -78,6 +78,8 @@ func main() {
 
 	// Configure Cors
 	router.Use(CORSMiddleware())
+
+	// Configure AWS
 	router.Use(func(c *gin.Context) {
 		c.Set("sess", sess)
 		c.Next()
