@@ -14,12 +14,12 @@ const CreatePost = (props) => {
     const [expand, setExpand] = useState(false);
 
     const submit = () => {
-        const formData = new FormData()
-        formData.append('file', selectedFile)
-
-        const type = selectedFile.type.split("/")
-
         if (selectedFile) {
+            const formData = new FormData()
+            formData.append('file', selectedFile)
+
+            const type = selectedFile.type.split("/")
+
             axios.post(`http://localhost:8080/api/posts/upload/${type[0]}`, formData,
             { headers: { "Content-type": "multipart/form-data" } },
             { withCredentials: true }).then((res) => {
@@ -31,14 +31,13 @@ const CreatePost = (props) => {
     };
 
     const createPost = (fileId) => {
-        console.log(fileId);
         axios.post('http://localhost:8080/api/posts', {
             user_id: user.id,
             file_id: fileId,
             title,
             content
         }, { withCredentials: true }).then(() => {
-            setTitle(''); setContent(''); selectedFile(''); setExpand(false);
+            setTitle(''); setContent(''); setSelectedFile(''); setExpand(false);
             props.submit(true);
         });
     };

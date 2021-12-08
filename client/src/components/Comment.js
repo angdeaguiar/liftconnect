@@ -27,6 +27,7 @@ const Comment = (props) => {
             props.submit(true);
         })
         .catch((err) => props.setError(err));
+        props.submit(false);
     };
 
     const removeComment = (id) => {
@@ -36,6 +37,7 @@ const Comment = (props) => {
             props.submit(true);
         })
         .catch((err) => props.setError(err));
+        props.submit(false);
     };
 
     return (

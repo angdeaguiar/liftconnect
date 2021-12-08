@@ -52,7 +52,7 @@ const Login = () => {
                     onChange={e => setPassword(e.target.value)}
                 />
                 <p>Not a user? <a href="/register">Sign Up</a></p>
-                <button className="w-100 btn btn-lg btn-primary" type="button" onClick={() => submit()}>Sign in</button>
+                <button className="w-100 btn btn-lg btn-primary btn-color" type="button" onClick={() => submit()}>Sign in</button>
             </form>
         </div>
     );

@@ -131,7 +131,7 @@ func RecommendedUserHandler(c *gin.Context) {
 	id := c.Param("id")
 
 	user := models.User{}
-	recommendedUsers := []models.User{}
+	recommendedUsers := models.Users{}
 	prs := models.PersonalRecords{}
 
 	if err := models.DB.Where("id = ?", id).Find(&user).Error; err != nil {
@@ -160,6 +160,15 @@ func RecommendedUserHandler(c *gin.Context) {
 		Find(&recommendedUsers).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
+	}
+
+	ups := models.PersonalRecords{}
+	for _, user := range recommendedUsers {
+		if err := models.DB.Where("user_id = ?", user.ID).Find(&ups).Error; err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+		user.PersonalRecords = &ups
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": recommendedUsers})

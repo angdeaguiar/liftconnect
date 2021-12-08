@@ -23,6 +23,7 @@ const Post = (props) => {
             props.submit(true);
         })
         .catch((err) => setError(err));
+        props.submit(false);
     };
 
     return (
@@ -56,7 +57,7 @@ const Post = (props) => {
                     )}
                 </div>
             </div>
-            <Comment comments={props.post.comments} setError={setError} />
+            <Comment post={props.post} comments={props.post.comments} submit={props.submit} setError={setError} />
         </div>
     );
 };

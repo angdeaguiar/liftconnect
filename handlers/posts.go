@@ -25,7 +25,7 @@ func GetPostsByUserHandler(c *gin.Context) {
 
 	if err := models.DB.
 		Select("posts.*").
-		Joins("join user_followings on posts.user_id = user_followings.following_id").
+		Joins("left join user_followings on posts.user_id = user_followings.following_id").
 		Where("user_followings.user_id = ? or posts.user_id = ?", id, id).
 		Order("posts.created_at desc").
 		Find(&posts).Error; err != nil {
@@ -39,7 +39,7 @@ func GetPostsByUserHandler(c *gin.Context) {
 			return
 		}
 
-		if len(post.FileID) > 0 {
+		if len(post.FileID.String) > 0 {
 			if err := mapFileToPost(post); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "unable to fetch a file for post"})
 				return

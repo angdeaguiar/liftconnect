@@ -13,4 +13,5 @@ require (
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20211108170745-6635138e15ea // indirect
 	golang.org/x/text v0.3.7 // indirect
+	gopkg.in/guregu/null.v2 v2.1.2 // indirect
 )

@@ -63,7 +63,7 @@ const Register = () => {
                     <option value="they/them">they/them</option>
                 </select>
                 <p>Already a user? <a href="/">Sign In</a></p>
-                <button className="w-100 btn btn-lg btn-primary" onClick={() => submit()}>Submit</button>
+                <button className="w-100 btn btn-lg btn-primary btn-color" onClick={() => submit()}>Submit</button>
             </form>
         </div>
     );

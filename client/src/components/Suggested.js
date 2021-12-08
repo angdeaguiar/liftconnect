@@ -21,6 +21,7 @@ const Suggested = () => {
         { withCredentials: true }).then(() => {
             setReload(true);
         });
+        setReload(false);
     }
 
     return (
@@ -33,6 +34,7 @@ const Suggested = () => {
                             <div className="suggested-name">
                                 <p>{u.first_name + " " + u.last_name + " (" + u.pronouns + ")"}</p>
                                 <p>{u.city}</p>
+                                <p>S: {u.personal_records.squat} D: {u.personal_records.deadlift} B: {u.personal_records.bench}</p>
                             </div>
                             <button
                                 className="no-style-btn"

@@ -1,17 +1,21 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	null "gopkg.in/guregu/null.v2"
+)
 
 // Post represents a single post within the application.
 type Post struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
-	User      *User     `json:"user" sql:"-"`
-	FileID    string    `json:"file_id,omitempty"`
-	File      *File     `json:"file" sql:"-"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string      `json:"id"`
+	UserID    string      `json:"user_id"`
+	User      *User       `json:"user" sql:"-"`
+	FileID    null.String `json:"file_id,omitempty"`
+	File      *File       `json:"file" sql:"-"`
+	Title     string      `json:"title"`
+	Content   string      `json:"content"`
+	CreatedAt time.Time   `json:"created_at"`
 
 	Comments []*Comment `json:"comments" sql:"-"`
 }

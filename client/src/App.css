@@ -134,7 +134,7 @@ html, body {
 }
 
 .right-lane {
- flex: 25%;
+  flex: 25%;
 }
 
 .container {
@@ -248,8 +248,8 @@ table {
   position: absolute;
   background-color: white;
   margin-top: -17px;
-  margin-left: 733px;
-  width: 24.4%;
+  margin-left: 738px;
+  width: 24.5%;
   border: 2px solid lightgrey;
   border-radius: 3px;
 }
@@ -300,6 +300,10 @@ table {
   padding: 10px;
   max-height: 100px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+}
+
+.nav-title {
+  color: #4183c4;
 }
 
 .title {
@@ -485,7 +489,7 @@ p {
 }
 
 .create-workout-btn {
-  margin-top: 67px;
+  margin-top: 75px;
   width: 90%;
   height: 50px;
   border-radius: 5px;
@@ -502,9 +506,17 @@ p {
   align-items: flex-start;
 }
 
+.suggested-name p {
+  margin: 0px;
+}
+
 .card-container {
   margin-bottom: 25px;
   padding: 15px 10px;
+}
+
+.card-text {
+  text-align: left;
 }
 
 .img-user {
@@ -645,6 +657,16 @@ a {
 .fake-link {
   color: rgb(79, 188, 255);
   text-decoration: underline;
+}
+
+.btn-color {
+  background-color: #89CFF0;
+  border-color: #89CFF0;
+}
+
+.btn-color:hover {
+  background-color: #89CFF0;
+  border-color: #89CFF0;
 }
 
 main {

@@ -23,3 +23,14 @@ type User struct {
 
 	PersonalRecords *PersonalRecords `json:"personal_records,omitempty" sql:"-"`
 }
+
+// Users is a slice of a user.
+type Users []*User
+
+func (us Users) IDs() []string {
+	ids := make([]string, len(us))
+	for i, u := range us {
+		ids[i] = u.ID
+	}
+	return ids
+}
